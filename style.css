@@ -1,0 +1,11 @@
+body {
+  background-color: rgb(9, 17, 26);
+}
+td {
+  height: 14px;
+  width: 14px;
+}
+#gameTable {
+  margin-top: 20px;
+  margin-left: 20px;
+}
