@@ -3,28 +3,53 @@ const H = 34;
 const W = 20;
 const wallColor = "rgb(22,41,63)";
 
+//블록 배열
 const blockArray = [
   [
+    [0, 0],
+    [0, 1],
+    [1, 0],
+    [1, 1],
+  ], //0블록
+  [
+    [0, 0],
+    [1, 0],
+    [2, 0],
+    [3, 0],
+  ], //I블록
+  [
+    [0, 0],
+    [1, 0],
+    [2, 0],
+    [2, 1],
+  ], //L블록
+  [
+    [2, 0],
+    [0, 1],
     [1, 1],
     [2, 1],
-    [3, 1],
-    [4, 1],
-  ],
+  ], //J블록
   [
+    [0, 0],
+    [1, 1],
+    [0, 1],
+    [0, 2],
+  ], //T블록
+  [
+    [0, 1],
+    [0, 2],
+    [1, 0],
+    [1, 1],
+  ], //S블록
+  [
+    [0, 0],
+    [0, 1],
     [1, 1],
     [1, 2],
-    [2, 1],
-    [3, 1],
-  ],
-  [
-    [1, 1],
-    [1, 2],
-    [2, 1],
-    [2, 2],
-  ],
-  [[]],
+  ], //Z블록
 ];
 
+//좌표 가져오기
 function getLoc(x, y) {
   let loc = document.getElementById(String(x) + " " + String(y));
   return loc;
@@ -58,11 +83,15 @@ function setWall() {
   }
 }
 
-function createBlock() {}
+//블록 생성하기
+function createBlock() {
+  shapeNum = parseInt(Math.random() * blockArray.length);
+}
 
 function init() {
   drawField();
   setWall();
+  createBlock();
 }
 
 init();

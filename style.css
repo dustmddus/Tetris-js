@@ -1,11 +1,49 @@
 body {
   background-color: rgb(9, 17, 26);
+  display: flex;
 }
 td {
   height: 14px;
   width: 14px;
 }
+li {
+  list-style: none;
+}
 #gameTable {
   margin-top: 20px;
   margin-left: 20px;
+}
+#scoreBoard {
+  order: 2;
+  background-color: rgb(14, 31, 49);
+  width: 100px;
+  margin-left: 3px;
+  margin-top: 20px;
+  padding: 0;
+}
+
+#info {
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  background-color: rgb(21, 46, 74);
+  padding: 10px;
+  text-align: center;
+}
+#level,
+#score,
+#next {
+  height: 80px;
+  color: white;
+  font-size: 28px;
+  text-align: center;
+  font-weight: bold;
+  background-color: rgb(14, 31, 49);
+}
+#help {
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  padding: 5px;
+  margin-bottom: 5px;
 }
