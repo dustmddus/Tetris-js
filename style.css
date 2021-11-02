@@ -6,14 +6,12 @@ td {
   height: 14px;
   width: 14px;
 }
-li {
-  list-style: none;
-}
+
 #gameTable {
   margin-top: 20px;
   margin-left: 20px;
 }
-#scoreBoard {
+#scoreField {
   order: 2;
   background-color: rgb(14, 31, 49);
   width: 100px;
@@ -22,7 +20,7 @@ li {
   padding: 0;
 }
 
-#info {
+.sub {
   color: white;
   font-size: 22px;
   font-weight: bold;

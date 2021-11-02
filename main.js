@@ -4,9 +4,11 @@ const W = 20;
 const wallColor = "rgb(22,41,63)";
 let existField;
 let shapeColor;
+let shapePoint;
 let nextShape, nextColorIndex;
 let currentShape, currentColorIndex;
-let createPoint = [1, parseInt(w / 2) - 2];
+let movingTread, movingSpeed;
+let createPoint = [1, parseInt(W / 2) - 2];
 
 //블록 배열
 const blockArray = [
@@ -64,7 +66,7 @@ var shapeColorArray = [
   "rgb(102,86,167)",
 ];
 
-//좌표 가져오기
+//블록 좌표 가져오기
 function getLoc(x, y) {
   let loc = document.getElementById(String(x) + " " + String(y));
   return loc;
@@ -102,12 +104,12 @@ function initExistField() {
 //게임판 경계선 그리기
 function setWall() {
   for (let i = 0; i < H; i++) {
-    drawBlock(i, 0);
-    drawBlock(i, W - 1);
+    drawBlock(i, 0, wallColor);
+    drawBlock(i, W - 1, wallColor);
   }
   for (let i = 0; i < W; i++) {
-    drawBlock(0, i);
-    drawBlock(H - 1, i);
+    drawBlock(0, i, wallColor);
+    drawBlock(H - 1, i, wallColor);
   }
 }
 
@@ -121,26 +123,65 @@ function chooseNextColor() {
 }
 
 //블록 색입히기
-function drawBlock(x, y) {
-  getLoc(x, y).style.background = wallColor;
+function drawBlock(x, y, color) {
+  getLoc(x, y).style.background = color;
 }
 
 //블록 생성하기
 function createShape() {
+  shapePoint[0] = createPoint[0];
+  shapePoint[1] = createPoint[1];
   currentShape = nextShape;
   currentColorIndex = nextColorIndex;
   shapeColor = shapeColorArray[currentColorIndex];
   let shape = blockArray[currentShape];
   chooseNextShape();
   chooseNextColor();
+  displayNextShape();
+  for (let i = 0; i < shape.length; i++) {
+    let sx = shapePoint[0] + shape[i][0];
+    let sy = shapePoint[1] + shape[i][1];
+    if (!isValidPoint(sx, sy)) gameOver();
+  }
 }
 
-function moveBlock(newBlock) {}
+function displayNextShape() {
+  initNextTable();
+  let shape = blockArray[nextShape];
+  let color = shapeColorArray[nextColorIndex];
+  for (let i = 0; i < 4; i++) {
+    let x = shape[i][0];
+    let y = shape[i][1];
+    drawBlock(x, y, color);
+  }
+}
+
+function initTable() {
+  for (let i = 0; i < 4; i++) {
+    for (let j = 0; j < 4; j++) {
+      document.getElementById(String(i) + String(j)).style.background =
+        "rgb(14,31,49)";
+    }
+  }
+}
+
+function isValidPoint(x, y) {
+  return !(y <= 0 || y > H - 1 || x <= 0 || x > W - 1 || existField[x][y]);
+}
+
+function gameOver() {
+  clearTimeout(movingTread);
+  initExistField();
+  alert("[Game Over]\nLevel: " + level + "\nScore: " + score);
+  document.getElementById("gameField").style.visibility = "hidden";
+  document.getElementById("gameover").style.visibility = "visible";
+}
 
 function init() {
   drawField();
-  setWall();
-  setInterval(drawInitBlock(), 1000);
+  chooseNextShape();
+  chooseNextColor();
+  createShape();
 }
 
 init();
