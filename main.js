@@ -4,60 +4,141 @@ const W = 20;
 const wallColor = "rgb(22,41,63)";
 let existField;
 let shapeColor;
-let shapePoint;
+let shapePoint = [0, 0];
 let nextShape, nextColorIndex;
 let currentShape, currentColorIndex;
 let movingTread, movingSpeed;
 let createPoint = [1, parseInt(W / 2) - 2];
 
 //블록 배열
-const blockArray = [
+const shapeArray = [
+  //z블록
   [
-    [0, 0],
-    [0, 1],
-    [1, 0],
-    [1, 1],
-  ], //0블록
-  [
-    [0, 0],
-    [1, 0],
-    [2, 0],
-    [3, 0],
-  ], //I블록
-  [
-    [0, 0],
-    [1, 0],
-    [2, 0],
-    [2, 1],
-  ], //L블록
-  [
-    [2, 0],
-    [0, 1],
-    [1, 1],
-    [2, 1],
-  ], //J블록
-  [
-    [0, 0],
+    [2, 2],
+    [1, 2],
     [1, 1],
     [0, 1],
+  ],
+  [
+    [1, 1],
+    [1, 0],
     [0, 2],
-  ], //T블록
-  [
     [0, 1],
-    [0, 2],
-    [1, 0],
-    [1, 1],
-  ], //S블록
+  ],
   [
-    [0, 0],
-    [0, 1],
+    [2, 1],
     [1, 1],
     [1, 2],
-  ], //Z블록
+    [0, 2],
+  ],
+  [
+    [1, 2],
+    [1, 1],
+    [0, 1],
+    [0, 0],
+  ],
+  //O 블록
+  [
+    [1, 2],
+    [1, 1],
+    [0, 2],
+    [0, 1],
+  ],
+  //T블록
+  [
+    [2, 0],
+    [1, 1],
+    [1, 0],
+    [0, 0],
+  ],
+  [
+    [1, 1],
+    [0, 2],
+    [0, 1],
+    [0, 0],
+  ],
+  [
+    [2, 2],
+    [1, 2],
+    [1, 1],
+    [0, 2],
+  ],
+  [
+    [1, 2],
+    [1, 1],
+    [1, 0],
+    [0, 1],
+  ],
+  //I블록
+  [
+    [3, 1],
+    [2, 1],
+    [1, 1],
+    [0, 1],
+  ],
+  [
+    [1, 3],
+    [1, 2],
+    [1, 1],
+    [1, 0],
+  ],
+  //L블록
+  [
+    [2, 2],
+    [2, 1],
+    [1, 1],
+    [0, 1],
+  ],
+  [
+    [1, 0],
+    [0, 2],
+    [0, 1],
+    [0, 0],
+  ],
+  [
+    [2, 2],
+    [1, 2],
+    [0, 2],
+    [0, 1],
+  ],
+  [
+    [1, 2],
+    [1, 1],
+    [1, 0],
+    [0, 2],
+  ],
+  //J블록
+  [
+    [2, 2],
+    [2, 1],
+    [1, 2],
+    [0, 2],
+  ],
+  [
+    [2, 2],
+    [2, 1],
+    [2, 0],
+    [1, 0],
+  ],
+  [
+    [2, 1],
+    [1, 1],
+    [0, 1],
+    [0, 2],
+  ],
+  [
+    [1, 2],
+    [0, 2],
+    [0, 1],
+    [0, 0],
+  ],
 ];
-
+//회전 시 바뀌는 블록 인덱스
+const shapeRotateMap = [
+  1, 0, 3, 2, 4, 6, 7, 8, 5, 10, 9, 12, 13, 14, 11, 16, 17, 18, 15,
+];
 //블록 색상
-var shapeColorArray = [
+const shapeColorArray = [
   "rgb(199,82,82)",
   "rgb(233,174,43)",
   "rgb(105,155,55)",
@@ -106,16 +187,20 @@ function setWall() {
   for (let i = 0; i < H; i++) {
     drawBlock(i, 0, wallColor);
     drawBlock(i, W - 1, wallColor);
+    existField[i][0] = true;
+    existField[i][W - 1] = true;
   }
   for (let i = 0; i < W; i++) {
     drawBlock(0, i, wallColor);
     drawBlock(H - 1, i, wallColor);
+    existField[0][i] = true;
+    existField[H - 1][i] = true;
   }
 }
 
 //랜덤 블록 뽑기
 function chooseNextShape() {
-  nextShape = parseInt(Math.random() * blockArray.length);
+  nextShape = parseInt(Math.random() * shapeArray.length);
 }
 //랜덤 블록 색상
 function chooseNextColor() {
@@ -134,7 +219,7 @@ function createShape() {
   currentShape = nextShape;
   currentColorIndex = nextColorIndex;
   shapeColor = shapeColorArray[currentColorIndex];
-  let shape = blockArray[currentShape];
+  let shape = shapeArray[currentShape];
   chooseNextShape();
   chooseNextColor();
   displayNextShape();
@@ -142,12 +227,12 @@ function createShape() {
     let sx = shapePoint[0] + shape[i][0];
     let sy = shapePoint[1] + shape[i][1];
     if (!isValidPoint(sx, sy)) gameOver();
+    drawBlock(parseInt(sy), parseInt(sx));
   }
 }
 
 function displayNextShape() {
-  initNextTable();
-  let shape = blockArray[nextShape];
+  let shape = shapeArray[nextShape];
   let color = shapeColorArray[nextColorIndex];
   for (let i = 0; i < 4; i++) {
     let x = shape[i][0];
@@ -179,6 +264,9 @@ function gameOver() {
 
 function init() {
   drawField();
+  initExistField();
+  setWall();
+  nextColorIndex = -1;
   chooseNextShape();
   chooseNextColor();
   createShape();
