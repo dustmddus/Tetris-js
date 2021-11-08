@@ -1,14 +1,37 @@
 const body = document.querySelector("body");
 const H = 34;
 const W = 20;
+const tileColor = "rgb(9,17,26)";
 const wallColor = "rgb(22,41,63)";
 let existField;
 let shapeColor;
-let shapePoint = [0, 0];
+let shapePoint;
+let shapeCell;
+let score;
+let level;
 let nextShape, nextColorIndex;
 let currentShape, currentColorIndex;
 let movingTread, movingSpeed;
+let initSpeed = 500;
+let deltaSpeed = 40;
+let fastMode = false;
 let createPoint = [1, parseInt(W / 2) - 2];
+
+function init() {
+  drawField();
+  initExistField();
+  setWall();
+  shapePoint = [1, 1];
+  shapeCell = [];
+  score = 0;
+  level = 1;
+  nextColorIndex = -1;
+  chooseNextShape();
+  chooseNextColor();
+  createShape();
+}
+
+init();
 
 //블록 배열
 const shapeArray = [
@@ -227,8 +250,11 @@ function createShape() {
     let sx = shapePoint[0] + shape[i][0];
     let sy = shapePoint[1] + shape[i][1];
     if (!isValidPoint(sx, sy)) gameOver();
-    drawBlock(parseInt(sy), parseInt(sx));
+    drawBlock(parseInt(sy), parseInt(sx), shapeColor);
+    shapeCell.push([sy, sx]);
   }
+  levelStack++;
+  leveling();
 }
 
 function displayNextShape() {
@@ -254,6 +280,18 @@ function isValidPoint(x, y) {
   return !(y <= 0 || y > H - 1 || x <= 0 || x > W - 1 || existField[x][y]);
 }
 
+function leveling() {
+  if (level == 10) return;
+  if (levelStack === level * 10) {
+    level++;
+    levelStack = 0;
+    if (!fastMode) {
+      movingSpeed = initSpeed - level * deltaSpeed;
+    }
+  }
+  document.getElementById("level").innerHTML = level;
+}
+
 function gameOver() {
   clearTimeout(movingTread);
   initExistField();
@@ -261,15 +299,3 @@ function gameOver() {
   document.getElementById("gameField").style.visibility = "hidden";
   document.getElementById("gameover").style.visibility = "visible";
 }
-
-function init() {
-  drawField();
-  initExistField();
-  setWall();
-  nextColorIndex = -1;
-  chooseNextShape();
-  chooseNextColor();
-  createShape();
-}
-
-init();
