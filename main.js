@@ -9,6 +9,7 @@ let shapePoint;
 let shapeCell;
 let score;
 let level;
+let levelStack = 0;
 let nextShape, nextColorIndex;
 let currentShape, currentColorIndex;
 let movingTread, movingSpeed;
@@ -16,22 +17,6 @@ let initSpeed = 500;
 let deltaSpeed = 40;
 let fastMode = false;
 let createPoint = [1, parseInt(W / 2) - 2];
-
-function init() {
-  drawField();
-  initExistField();
-  setWall();
-  shapePoint = [1, 1];
-  shapeCell = [];
-  score = 0;
-  level = 1;
-  nextColorIndex = -1;
-  chooseNextShape();
-  chooseNextColor();
-  createShape();
-}
-
-init();
 
 //블록 배열
 const shapeArray = [
@@ -170,6 +155,22 @@ const shapeColorArray = [
   "rgb(102,86,167)",
 ];
 
+function init() {
+  drawField();
+  initExistField();
+  setWall();
+  shapePoint = [1, 1];
+  shapeCell = [];
+  score = 0;
+  level = 1;
+  nextColorIndex = -1;
+  chooseNextShape();
+  chooseNextColor();
+  createShape();
+}
+
+init();
+
 //블록 좌표 가져오기
 function getLoc(x, y) {
   let loc = document.getElementById(String(x) + " " + String(y));
@@ -247,9 +248,9 @@ function createShape() {
   chooseNextColor();
   displayNextShape();
   for (let i = 0; i < shape.length; i++) {
-    let sx = shapePoint[0] + shape[i][0];
-    let sy = shapePoint[1] + shape[i][1];
-    if (!isValidPoint(sx, sy)) gameOver();
+    let sy = shapePoint[0] + shape[i][0];
+    let sx = shapePoint[1] + shape[i][1];
+    if (!isValidPoint(sy, sx)) gameOver();
     drawBlock(parseInt(sy), parseInt(sx), shapeColor);
     shapeCell.push([sy, sx]);
   }
@@ -258,20 +259,56 @@ function createShape() {
 }
 
 function displayNextShape() {
+  initNextTable();
   let shape = shapeArray[nextShape];
   let color = shapeColorArray[nextColorIndex];
   for (let i = 0; i < 4; i++) {
     let x = shape[i][0];
     let y = shape[i][1];
-    drawBlock(x, y, color);
+    document.getElementById(String(y) + String(x)).style.background = color;
   }
 }
 
-function initTable() {
+function initNextTable() {
   for (let i = 0; i < 4; i++) {
     for (let j = 0; j < 4; j++) {
       document.getElementById(String(i) + String(j)).style.background =
         "rgb(14,31,49)";
+    }
+  }
+}
+
+function moveDown() {
+  if (!canMove(1, 0)) {
+    commitExist();
+    shapeCell = [];
+    createShape();
+    return;
+  }
+}
+
+function commitExist() {
+  for (let i = 0; i < shapeCell.length; i++) {
+    let y = shapeCell[i][0];
+    let x = shapeCell[i][1];
+    existField[y][x] = true;
+  }
+}
+
+function canMove(dy, dx) {
+  for (let i = 0; i < shapeCell.length; i++) {
+    let ny = shapeCell[i][0] + dy;
+    let nx = shapeCell[i][1] + dx;
+    if (!isValidPoint(ny, nx)) return false;
+  }
+  return true;
+}
+
+function removeLine(lineIndex) {
+  for (let i = lineIndex - 1; i >= 1; i--) {
+    for (let j = 1; j < W - 1; j++) {
+      getLoc(i + 1, j).style.background = getLoc(i, j).style.background;
+      existField[i + 1][j] = existField[i][j];
     }
   }
 }

@@ -26,12 +26,21 @@ td {
   font-weight: bold;
   background-color: rgb(21, 46, 74);
   padding: 10px;
+  margin: 0px;
   text-align: center;
 }
+
+#nextTable {
+  float: right;
+  margin: 0px;
+  position: absolute;
+  left: 402px;
+  top: 358px;
+}
+
 #level,
-#score,
-#next {
-  height: 80px;
+#score {
+  height: 30px;
   color: white;
   font-size: 28px;
   text-align: center;
@@ -44,4 +53,12 @@ td {
   font-weight: bold;
   padding: 5px;
   margin-bottom: 5px;
+}
+#pause,
+#gameover {
+  position: absolute;
+  left: 200px;
+  top: 200px;
+  visibility: hidden;
+  color: white;
 }
