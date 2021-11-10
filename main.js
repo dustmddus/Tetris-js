@@ -171,6 +171,18 @@ function init() {
 
 init();
 
+document.onkeydown = keyDownEventHandler;
+function keyDownEventHandler(e) {
+  switch (e.keyCode) {
+    case 37:
+      setTimeout("moveLR(-1)", 0);
+      break;
+    case 39:
+      setTimeout("moveLR(1)", 0);
+      break;
+  }
+}
+
 //블록 좌표 가져오기
 function getLoc(x, y) {
   let loc = document.getElementById(String(x) + " " + String(y));
@@ -257,7 +269,7 @@ function createShape() {
   levelStack++;
   leveling();
 }
-
+//다음 블록 모양 출력
 function displayNextShape() {
   initNextTable();
   let shape = shapeArray[nextShape];
@@ -269,6 +281,7 @@ function displayNextShape() {
   }
 }
 
+//다음 블록 모양 보여주는 테이블 초기화
 function initNextTable() {
   for (let i = 0; i < 4; i++) {
     for (let j = 0; j < 4; j++) {
@@ -287,6 +300,7 @@ function moveDown() {
   }
 }
 
+//존재여부 체크
 function commitExist() {
   for (let i = 0; i < shapeCell.length; i++) {
     let y = shapeCell[i][0];
@@ -295,6 +309,7 @@ function commitExist() {
   }
 }
 
+//이동 가능 여부
 function canMove(dy, dx) {
   for (let i = 0; i < shapeCell.length; i++) {
     let ny = shapeCell[i][0] + dy;
@@ -304,6 +319,17 @@ function canMove(dy, dx) {
   return true;
 }
 
+//오른쪽,왼쪽 움직이기
+function moveLR(delta) {
+  if (!canMove(0, delta) || isPaused) return;
+  removeShape();
+  for (let i = 0; i < shapeCell.length; i++) {
+    shapeCell[i][1] += delta;
+    showShape();
+  }
+}
+
+//완성된 줄 지우기
 function removeLine(lineIndex) {
   for (let i = lineIndex - 1; i >= 1; i--) {
     for (let j = 1; j < W - 1; j++) {
@@ -313,10 +339,12 @@ function removeLine(lineIndex) {
   }
 }
 
+//존재할 수 있는 곳인지 확인
 function isValidPoint(x, y) {
   return !(y <= 0 || y > H - 1 || x <= 0 || x > W - 1 || existField[x][y]);
 }
 
+//레벨 관리
 function leveling() {
   if (level == 10) return;
   if (levelStack === level * 10) {
@@ -329,6 +357,7 @@ function leveling() {
   document.getElementById("level").innerHTML = level;
 }
 
+//종료
 function gameOver() {
   clearTimeout(movingTread);
   initExistField();
