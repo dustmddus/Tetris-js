@@ -12,9 +12,10 @@ let level;
 let levelStack = 0;
 let nextShape, nextColorIndex;
 let currentShape, currentColorIndex;
-let movingTread, movingSpeed;
+let movingThread, movingSpeed;
 let initSpeed = 500;
 let deltaSpeed = 40;
+let fastSpeed = 25;
 let fastMode = false;
 let createPoint = [1, parseInt(W / 2) - 2];
 
@@ -164,6 +165,7 @@ function init() {
   score = 0;
   level = 1;
   nextColorIndex = -1;
+  movingSpeed = initSpeed;
   chooseNextShape();
   chooseNextColor();
   createShape();
@@ -179,6 +181,15 @@ function keyDownEventHandler(e) {
       break;
     case 39:
       setTimeout("moveLR(1)", 0);
+      break;
+    case 32:
+      setTimeout("rotateShape()", 0);
+      break;
+    case 40:
+      moveFast();
+      break;
+    case 80:
+      pause();
       break;
   }
 }
@@ -268,6 +279,7 @@ function createShape() {
   }
   levelStack++;
   leveling();
+  movingThread = setTimeout("moveDown()", movingSpeed);
 }
 //다음 블록 모양 출력
 function displayNextShape() {
@@ -309,6 +321,20 @@ function commitExist() {
   }
 }
 
+function checkLine() {
+  let plusScore = level * 100;
+  let combo = 0;
+  let finalScore = 0;
+  for (let i = H - 2; i > 1; i--) {
+    if (isFull(i)) {
+      removeLine(i);
+      i++;
+      finalScore += updateScore(plusScore, ++combo);
+    }
+    if (combo > 0) displayCombo(combo, finalScore);
+  }
+}
+
 //이동 가능 여부
 function canMove(dy, dx) {
   for (let i = 0; i < shapeCell.length; i++) {
@@ -327,6 +353,13 @@ function moveLR(delta) {
     shapeCell[i][1] += delta;
     showShape();
   }
+}
+
+function moveFast() {
+  if (fastMode) return;
+  clearTimeout(movingThread);
+  movingSpeed = fastSpeed;
+  movingThread;
 }
 
 //완성된 줄 지우기
@@ -357,9 +390,24 @@ function leveling() {
   document.getElementById("level").innerHTML = level;
 }
 
+function displayCombo(combo, finalScore) {
+  let comboStr = combo + " COMBO +" + finalScore;
+  document.getElementById("comboField").innerHTML = comboStr;
+  setTimeout(function () {
+    document.getElementById("comboField").innerHTML = "";
+  });
+}
+
+function updateScore(plusScore, combo) {
+  let comboScore = plusScore * combo;
+  score += comboScore;
+  document.getElementById("score").innerHTML = score;
+  return comboScore;
+}
+
 //종료
 function gameOver() {
-  clearTimeout(movingTread);
+  clearTimeout(movingThread);
   initExistField();
   alert("[Game Over]\nLevel: " + level + "\nScore: " + score);
   document.getElementById("gameField").style.visibility = "hidden";
