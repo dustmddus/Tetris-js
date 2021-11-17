@@ -7,7 +7,7 @@ td {
   width: 14px;
 }
 
-#gameTable {
+#gameField {
   margin-top: 20px;
   margin-left: 20px;
 }
@@ -48,12 +48,25 @@ td {
   background-color: rgb(14, 31, 49);
 }
 #help {
+  font-size: 18px;
   color: white;
+  height: 32px;
   text-align: center;
   font-weight: bold;
   padding: 5px;
   margin-bottom: 5px;
 }
+#comboField {
+  position: absolute;
+  left: 27px;
+  top: 320px;
+  width: 384px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+}
+
 #pause,
 #gameover {
   position: absolute;

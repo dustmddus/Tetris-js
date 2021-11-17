@@ -18,6 +18,7 @@ let deltaSpeed = 40;
 let fastSpeed = 25;
 let fastMode = false;
 let createPoint = [1, parseInt(W / 2) - 2];
+let isPaused = false;
 
 //블록 배열
 const shapeArray = [
@@ -156,6 +157,8 @@ const shapeColorArray = [
   "rgb(102,86,167)",
 ];
 
+init();
+
 function init() {
   drawField();
   initExistField();
@@ -170,8 +173,6 @@ function init() {
   chooseNextColor();
   createShape();
 }
-
-init();
 
 document.onkeydown = keyDownEventHandler;
 function keyDownEventHandler(e) {
@@ -192,6 +193,11 @@ function keyDownEventHandler(e) {
       pause();
       break;
   }
+}
+
+document.onkeyup = keyUpEventHandler;
+function keyUpEventHandler(e) {
+  if (e.keyCode == 40) moveSlow();
 }
 
 //블록 좌표 가져오기
@@ -259,6 +265,36 @@ function drawBlock(x, y, color) {
   getLoc(x, y).style.background = color;
 }
 
+function rotateShape() {
+  if (!canRotate()) return;
+  removeShape();
+  shapeCell = [];
+  currentShape = shapeRotateMap[currentShape];
+  let rotateShape = shapeArray[currentShape];
+  for (let i = 0; i < 4; i++) {
+    let sy = shapePoint[0] + rotateShape[i][0];
+    let sx = shapePoint[1] + rotateShape[i][1];
+    shapeCell.push([sy, sx]);
+  }
+  showShape();
+}
+
+function canRotate() {
+  let tempShape = shapeArray[shapeRotateMap[currentShape]];
+  for (let i = 0; i < 4; i++) {
+    let ty = shapePoint[0] + tempShape[i][0];
+    let tx = shapePoint[1] + tempShape[i][1];
+    if (!isValidPoint(ty, tx)) return false;
+  }
+  return true;
+}
+
+function showShape() {
+  for (let i = 0; i < shapeCell.length; i++) {
+    drawBlock(shapeCell[i][0], shapeCell[i][1], shapeColor);
+  }
+}
+
 //블록 생성하기
 function createShape() {
   shapePoint[0] = createPoint[0];
@@ -306,10 +342,16 @@ function initNextTable() {
 function moveDown() {
   if (!canMove(1, 0)) {
     commitExist();
+    checkLine();
     shapeCell = [];
     createShape();
     return;
   }
+  removeShape();
+  for (let i = 0; i < shapeCell.length; i++) shapeCell[i][0]++;
+  shapePoint[0]++;
+  showShape();
+  movingThread = setTimeout("moveDown()", movingSpeed);
 }
 
 //존재여부 체크
@@ -355,11 +397,33 @@ function moveLR(delta) {
   }
 }
 
+function removeShape() {
+  for (let i = 0; i < shapeCell.length; i++) {
+    drawBlock(shapeCell[i][0], shapeCell[i][1], tileColor);
+  }
+}
+
 function moveFast() {
   if (fastMode) return;
   clearTimeout(movingThread);
   movingSpeed = fastSpeed;
-  movingThread;
+  movingThread = setTimeout("moveDown()", movingSpeed);
+  fastMode = true;
+}
+
+function moveSlow() {
+  if (!fastMode) return;
+  clearTimeout(movingThread);
+  movingSpeed = initSpeed - level * deltaSpeed;
+  movingThread = setTimeout("moveDown()", movingSpeed);
+  fastMode = false;
+}
+
+function isFull(lineIndex) {
+  for (let i = 1; i < W - 1; i++) {
+    if (!existField[lineIndex][i]) return false;
+  }
+  return true;
 }
 
 //완성된 줄 지우기
@@ -412,4 +476,18 @@ function gameOver() {
   alert("[Game Over]\nLevel: " + level + "\nScore: " + score);
   document.getElementById("gameField").style.visibility = "hidden";
   document.getElementById("gameover").style.visibility = "visible";
+}
+
+function pause() {
+  if (isPaused) {
+    movingThread = setTimeout("moveDown()", movingSpeed);
+    document.getElementById("pause").style.visibility = "hidden";
+    document.getElementById("gameField").style.visibility = "visible";
+    isPaused = false;
+  } else {
+    clearTimeout(movingThread);
+    document.getElementById("gameField").style.visibility = "hidden";
+    document.getElementById("pause").style.visibility = "visible";
+    isPaused = true;
+  }
 }
